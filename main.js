@@ -5,14 +5,14 @@ window.jQuery = function(nodeOrSelector){
     return nodes
 }
 
-window.jQuery.ajax = function({method, body, headers, successFn, failFn}){
-    let url
-    if(arguments.length === 1){
-        url = options.url
-    }else if(arguments.length === 2){
-        url = arguments[0]
-        options = arguments[1]
-    }
+window.jQuery.ajax = function({url, method, body, headers}){
+    //let url
+    //if(arguments.length === 1){
+    //    url = options.url
+    //}else if(arguments.length === 2){
+    //    url = arguments[0]
+    //    options = arguments[1]
+    //}
     //let method = options.method
     //let body = options.body
     //let headers = options.headers
@@ -23,22 +23,24 @@ window.jQuery.ajax = function({method, body, headers, successFn, failFn}){
     // ES6语法  析构赋值
     // let {method, body, headers, successFn, failFn} = options
 
-    let request = new XMLHttpRequest() //声明一个XMLHttpRequest对象
-    request.open(method, url) // 配置request
-    for(key in headers){
-        let value = headers[key]
-        request.setRequestHeader(key, value)
-    }
-    request.onreadystatechange = ()=>{
-        if(request.readyState === 4){
-            if(request.status >= 200 && request.status < 300){
-                successFn.call(undefined, request.responseText)
-            }else if(request.status >= 400){
-                failFn.call(undefined, request)
+    return new Promise(function(resolve, reject){
+        let request = new XMLHttpRequest() //声明一个XMLHttpRequest对象
+        request.open(method, url) // 配置request
+        for(key in headers){
+            let value = headers[key]
+            request.setRequestHeader(key, value)
+        }
+        request.onreadystatechange = ()=>{
+            if(request.readyState === 4){
+               if(request.status >= 200 && request.status < 300){
+                    resolve.call(undefined, request.responseText)
+                }else if(request.status >= 400){
+                    reject.call(undefined, request)
+                }
             }
         }
-    }
-    request.send(body) //发送
+        request.send(body) //发送
+    })
 }
 
 window.$ = window.jQuery
@@ -49,19 +51,30 @@ function f2(responseText){}
 myButton.addEventListener('click', (e)=>{
     window.jQuery.ajax(
         {
-            url: '/frank',
+            url: '/xxx',
             method: 'get',
-            success: (x)=>{
-                console.log(x)
-                f1.call(undefined, x)
-                f2.call(undefined, x)
-            },
-            error: (x)=>{
-                console.log(x)
-                console.log(x.status)
-            }
         }
+    ).then(
+        (text)=>{console.log(text)}, 
+        (request)=>{console.log(request)}
     )
+
+// promise 用法
+//myButton.addEventListener('click', (e)=>{
+    //$.ajax(
+    //    {
+    //        url: '/frank',
+    //        method: 'get'
+    //    }
+    //).then(
+    //    (responseText)=>{
+    //        console.log(responseText)
+    //    }, 
+    //    (request)=>{
+    //        console.log(request)
+    //        console.log(request.status)
+    //    })
+    
 
     //let obj = {
     //    url: '/xxx',
